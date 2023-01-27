@@ -11,49 +11,51 @@ class UserController {
 				httpOnly: true 
 			})
 		} catch (e) {
-			console.log(e);
+			next(e);
 		}
 	}
 	async login(req, res, next) {
 		try {
 			
 		} catch (e) {
-			
+			next(e);
 		}
 	}
 	async login(req, res, next) {
 		try {
 			
 		} catch (e) {
-			
+			next(e);
 		}
 	}
 	async logout(req, res, next) {
 		try {
 			
 		} catch (e) {
-			
+			next(e);
 		}
 	}
 	async activate(req, res, next) {
 		try {
-			
+			const activationLink = req.params.link;
+			await userService.activate(activationLink);
+			return res.redirect(process.env.CLIENT_URL);
 		} catch (e) {
-			
+			next(e);
 		}
 	}
 	async refresh(req, res, next) {
 		try {
 			
 		} catch (e) {
-			
+			next(e);
 		}
 	}
 	async getUsers(req, res, next) {
 		try {
 			res.json(['123', '234', '345']);
 		} catch (e) {
-			console.log(e);
+			next(e);
 		}
 	}
 }
