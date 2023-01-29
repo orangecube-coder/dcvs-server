@@ -5,6 +5,7 @@ const mailService = require("./mail-service");
 const tokenService = require("../service/token-service");
 const UserDto = require("../dtos/user-dtos");
 const ApiError = require("../exceptions/api-error");
+const userModel = require("../models/user-model");
 
 class UserService {
 	async registration(email, password) {
@@ -24,7 +25,6 @@ class UserService {
 
 		return { ...tokens, user: userDto };
 	}
-
 	async activate(activationLink) {
 		const user = await UserModel.findOne({ activationLink})
 		if (!user) {
@@ -32,6 +32,45 @@ class UserService {
 		}
 		user.isActivaed = true;
 		await user.save();
+	}
+	async login(email, password) {
+		const user = await UserModel.findOne({ email });
+		if (!user) {
+			throw ApiError.BadRequest(`Пользователь ${email} не найден!`);
+		}
+		const isPassEquals = await bcrypt.compare(password, user.password);
+		if (!isPassEquals) {
+			throw ApiError.BadRequest("Неверный пароль!");
+		}
+		const userDto = new UserDto(user);
+		const tokens = tokenService.generateTokens({...userDto});
+		await tokenService.saveToken(userDto.id, tokens.refreshToken);
+
+		return { ...tokens, user: userDto };
+	}
+	async logout(refreshToken) {
+		const token = await tokenService.removeToken(refreshToken);
+		return token;
+	}
+	async refresh(refreshToken) {
+		if (!refreshToken) {
+			throw ApiError.UnauthorizedError();
+		}
+		const userData = tokenService.validateRefreshToken(refreshToken);
+		const tokenFromDb = await tokenService.findToken(refreshToken);
+		if (!userData || !tokenFromDb) {
+			throw ApiError.UnauthorizedError();
+		}
+		const user = UserModel.findById(userData.id);
+		const userDto = new UserDto(user);
+		const tokens = tokenService.generateTokens({...userDto});
+		await tokenService.saveToken(userDto.id, tokens.refreshToken);
+
+		return { ...tokens, user: userDto };
+	}
+	async getAllUsers() {
+		const users = userModel.find();
+		return users;
 	}
 }
 
