@@ -3,13 +3,15 @@ GET http://localhost:5000 HTTP/1.1
 
 ### Get users ###
 GET http://localhost:5000/api/users HTTP/1.1
+Content-Type:  application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im9yYW5nZWN1YmUudGVhbUB5YS5ydSIsImlkIjoiNjNkN2NkNzdkODkyZmVlZjE5YjM0MzlkIiwicm9sZXMiOlsiVVNFUiJdLCJpYXQiOjE2NzUxNDY2NTgsImV4cCI6MTY3NTE0ODQ1OH0.KwgtJn3cz2HOmwZQNf3h6a8d6QVaxm8U-l2y-EVymaQ
 
 ### Registration ###
 POST http://localhost:5000/api/registration HTTP/1.1
 Content-Type:  application/json
 
 {
-	"email": "orangecube.team@ya.ru",
+	"email": "dm.410@ya.ru",
 	"password": "12345"
 }
 
@@ -22,14 +24,25 @@ Content-Type:  application/json
 	"password": "12345"
 }
 
+### Login ###
+POST http://localhost:5000/api/login HTTP/1.1
+Content-Type:  application/json
+
+{
+	"email": "dm.410@ya.ru",
+	"password": "12345"
+}
+
 ### Logout ###
 POST http://localhost:5000/api/logout HTTP/1.1
 Content-Type:  application/json
 
+### AddRole ###
+POST http://localhost:5000/api/role HTTP/1.1
+Content-Type:  application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRtLjQxMEB5YS5ydSIsImlkIjoiNjNkOGNkNzBlZGViODRjN2JkOWI1MDBmIiwicm9sZXMiOlsiVVNFUiIsIkFETUlOIl0sImlhdCI6MTY3NTE2MDY4MCwiZXhwIjoxNjc1MTYyNDgwfQ.tM61ujiREvfYmyRUPi5rh2tiSCgzBSA9mbI8cL-f6UE
+
 {
 	"email": "orangecube.team@ya.ru",
-	"password": "12345"
+	"role": "ADMIN"
 }
-
-### Get All Users ###
-GET http://localhost:5000/api/users HTTP/1.1

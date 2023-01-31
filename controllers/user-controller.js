@@ -22,13 +22,6 @@ class UserController {
 	}
 	async login(req, res, next) {
 		try {
-			
-		} catch (e) {
-			next(e);
-		}
-	}
-	async login(req, res, next) {
-		try {
 			const { email, password } = req.body;
 			const userData = await userService.login(email, password);
 			res.cookie('refreshToken', userData.refreshToken, {
@@ -72,10 +65,19 @@ class UserController {
 			next(e);
 		}
 	}
-	async getUsers(req, res, next) {
+	async getAllUsers(req, res, next) {
 		try {
 			const users = await userService.getAllUsers();
 			return res.json(users);
+		} catch (e) {
+			next(e);
+		}
+	}
+	async addRole(req, res, next) {
+		try {
+			const { email, role } = req.body;
+			const roleResult = await userService.addRole(email, role);
+			return res.json({ role });
 		} catch (e) {
 			next(e);
 		}
