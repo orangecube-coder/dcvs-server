@@ -11,8 +11,10 @@ POST http://localhost:5000/api/registration HTTP/1.1
 Content-Type:  application/json
 
 {
-	"email": "dm.410@ya.ru",
-	"password": "12345"
+	"firstName": "User",
+	"lastName": "Useroff",
+	"email": "user@ya.ru",
+	"password": "123"
 }
 
 ### Login ###

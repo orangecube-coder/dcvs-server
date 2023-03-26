@@ -1,7 +1,6 @@
 const nodemailer = require('nodemailer');
 
 class MailService {
-
 	constructor() {
 		this.transporter = nodemailer.createTransport({
 			host: process.env.SMTP_HOST,
@@ -13,15 +12,28 @@ class MailService {
 			}
 		})
 	}
-
+	// Send Link
 	async sendActivationMail(to, link) {
-		await this.transporter.sendMail({
-			from: process.env.SMTP_USER,
-			to,
-			subject: 'Активация на ' + process.env.API_URL,
-			text: '',
-			html: `<div><h1>Пройдите по ссылке</h1><a href="${link}">${link}</a></div>`
-		})
+		try {
+			await this.transporter.sendMail({
+				from: process.env.SMTP_USER,
+				to,
+				subject: 'Активация на ' + process.env.API_URL,
+				text: '',
+				html: `<div><h1>Пройдите по ссылке</h1><a href="${link}">${link}</a></div>`
+			})
+		} catch(err) {
+			throw err;
+		}
+	}
+	// Activate
+	async activate(activationLink) {
+		const user = await userModel.findOne({ activationLink})
+		if (!user) {
+			throw ApiError.BadRequest("Не корректная ссылка для активации!");
+		}
+		user.isActivaed = true;
+		await user.save();
 	}
 }
 

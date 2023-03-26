@@ -1,85 +1,54 @@
+const userModel = require("../models/user-model");
+const ApiError = require("../exceptions/api-error");
 const bcrypt = require("bcrypt");
 const uuid = require("uuid");
-const mailService = require("./mail-service");
-const tokenService = require("../service/token-service");
-const UserDto = require("../dtos/user-dtos");
-const ApiError = require("../exceptions/api-error");
-const userModel = require("../models/user-model");
 const roleModel = require("../models/role-model");
+const UserDto = require("../dtos/user-dtos");
 
 class UserService {
-	async registration(email, password) {
+	// Registration
+	async registration(firstName, lastName, email, password) {
 		const candidate = await userModel.findOne({ email });
 		if (candidate) {
-			throw ApiError.BadRequest(`Пользователь с адресом ${email} уже существует!`);
+			throw ApiError.BadRequest(`Пользователь с таким адресом уже существует!`);
 		}
 		const hashPassword = await bcrypt.hash(password, 3); 
 		const activationLink = uuid.v4();
 		const role = await roleModel.findOne({ value: 'USER' });
-		const user = await userModel.create({ email, password: hashPassword, activationLink, roles: [role.value] });
-		await mailService.sendActivationMail(email, `${process.env.API_URL}/api/activate/${activationLink}`);
-
-		const userDto = new UserDto(user); 
-		const tokens = tokenService.generateTokens({...userDto});
-		await tokenService.saveToken(userDto.id, tokens.refreshToken);
-
-		return { ...tokens, user: userDto };
-	}
-	async activate(activationLink) {
-		const user = await userModel.findOne({ activationLink})
-		if (!user) {
-			throw ApiError.BadRequest("Не корректная ссылка для активации!");
-		}
-		user.isActivaed = true;
-		await user.save();
-	}
-	async login(email, password) {
-		const user = await userModel.findOne({ email });
-		if (!user) {
-			throw ApiError.BadRequest(`Пользователь ${email} не найден!`);
-		}
-		const isPassEquals = await bcrypt.compare(password, user.password);
-		if (!isPassEquals) {
-			throw ApiError.BadRequest("Неверный пароль!");
-		}
+		const user = await userModel.create({
+			firstName, 
+			lastName, 
+			email, 
+			password: hashPassword, 
+			activationLink, 
+			roles: [role._id] 
+		});
 		const userDto = new UserDto(user);
-		const tokens = tokenService.generateTokens({...userDto});
-		await tokenService.saveToken(userDto.id, tokens.refreshToken);
-
-		return { ...tokens, user: userDto };
-	}
-	async logout(refreshToken) {
-		const token = await tokenService.removeToken(refreshToken);
-		return token;
-	}
-	async refresh(refreshToken) {
-		if (!refreshToken) {
-			throw ApiError.UnauthorizedError();
+		const message = {
+			state: "success",
+			msg: `Пользователь успешно зарегистрирован`,
+			err: ""
 		}
-		const userData = tokenService.validateRefreshToken(refreshToken);
-		const tokenFromDb = await tokenService.findToken(refreshToken);
-		if (!userData || !tokenFromDb) {
-			throw ApiError.UnauthorizedError();
-		}
-		const user = userModel.findById(userData.id);
-		const userDto = new UserDto(user);
-		const tokens = tokenService.generateTokens({...userDto});
-		await tokenService.saveToken(userDto.id, tokens.refreshToken);
-
-		return { ...tokens, user: userDto };
+		// try {
+		// 	await mailService.sendActivationMail(email, `${process.env.API_URL}/api/activate/${activationLink}`);
+		// } catch (err) {
+		// 	message.state = "warning";
+		// 	message.msg = message.msg + ", но с ошибкой!";
+		// 	message.err = err;
+		// }
+		console.log("123");
+		return { message, user: userDto };
 	}
+	// Get Users
 	async getAllUsers() {
-		const users = userModel.find();
+		const users = await userModel
+			.find({}, "-_id -password -__v")
+			.populate({ 
+				path: 'roles', 
+				select: '-_id -__v', 
+				transform: ({ value })  => value
+			});
 		return users;
-	}
-	async addRole(email, role) {
-		const user = await userModel.findOne({ email });
-		if (!user) {
-			throw ApiError.BadRequest(`Пользователь ${email} не найден!`);
-		}
-		user.roles.push(role);
-		await user.save();
-		return user;
 	}
 }
 

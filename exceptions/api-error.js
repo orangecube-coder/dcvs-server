@@ -12,9 +12,17 @@ module.exports = class ApiError extends Error {
 		return new ApiError(401, 'Пользователь не авторизован');
 	}
 
+	static PermissionDenied() {
+		return new ApiError(403, 'Недостаточно прав');
+	}
+
 	static BadRequest(message, errors = []) {
+		console.log(message);
 		return new ApiError(400, message, errors);
 	}
 
+	static MailerError(message, errors = []) {
+		return new ApiError(405, message, errors);
+	}
 
 }
