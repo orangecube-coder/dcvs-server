@@ -36,7 +36,6 @@ class UserService {
 		// 	message.msg = message.msg + ", но с ошибкой!";
 		// 	message.err = err;
 		// }
-		console.log("123");
 		return { message, user: userDto };
 	}
 	// Get Users

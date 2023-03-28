@@ -2,12 +2,11 @@ const roleService = require("../service/role-service");
 
 class RoleController {
 	// Add role to user
-	async addRole(req, res, next) {
+	async addUserRole(req, res, next) {
 		try {
 			const { email, role } = req.body;
-			const roles = await roleService.getAllRoles();	
-			const roleResult = await roleService.addRole(email, role);
-			return res.json({ role });
+			const roleResult = await roleService.addUserRole(email, role);
+			return res.json(roleResult);
 		} catch (e) {
 			next(e);
 		}

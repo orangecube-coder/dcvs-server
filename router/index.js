@@ -21,7 +21,7 @@ router.get('/activate/:link', mailController.activate);
 router.get('/refresh', authController.refresh);
 //router.get('/users', roleMiddleware(['USER']), userController.getAllUsers);
 router.get('/users', roleMiddleware(['ADMIN']), userController.getAllUsers);
-router.post('/role', roleMiddleware(['ADMIN']), roleController.addRole);
+router.post('/role', roleMiddleware(['ADMIN']), roleController.addUserRole);
 router.get("/", (req, res) => res.send("Conntection to API DCVS success!"));
 router.get("/roles", authMiddleware, roleController.getAllRoles);
 

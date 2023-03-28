@@ -45,6 +45,6 @@ Content-Type:  application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRtLjQxMEB5YS5ydSIsImlkIjoiNjNkOGNkNzBlZGViODRjN2JkOWI1MDBmIiwicm9sZXMiOlsiVVNFUiIsIkFETUlOIl0sImlhdCI6MTY3NTE2MDY4MCwiZXhwIjoxNjc1MTYyNDgwfQ.tM61ujiREvfYmyRUPi5rh2tiSCgzBSA9mbI8cL-f6UE
 
 {
-	"email": "orangecube.team@ya.ru",
+	"email": "new@ya.ru",
 	"role": "ADMIN"
 }
