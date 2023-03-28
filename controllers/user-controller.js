@@ -26,7 +26,16 @@ class UserController {
 			next(e);
 		}
 	}
-
+	// Add role to user
+	async addUserRole(req, res, next) {
+		try {
+			const { email, role } = req.body;
+			const roleResult = await roleService.addUserRole(email, role);
+			return res.json(roleResult);
+		} catch (e) {
+			next(e);
+		}
+	}
 }
 
 module.exports = new UserController();
