@@ -6,8 +6,8 @@ const roleModel = require("../models/role-model");
 const UserDto = require("../dtos/user-dtos");
 
 class UserService {
-  // Registration
-  async registration(firstName, lastName, email, password) {
+  // Add User
+  async addUser(firstName, lastName, email, password) {
     const candidate = await userModel.findOne({ email });
     if (candidate) {
       throw ApiError.BadRequest(`Такой пользователь уже существует!`);
@@ -38,7 +38,7 @@ class UserService {
     // }
     return { message, user: userDto };
   }
-  // Get Users
+  // Get all Users
   async getAllUsers() {
     const users = await userModel.find({}, "-_id -password -__v").populate({
       path: "roles",
@@ -68,28 +68,28 @@ class UserService {
     };
     return { message, user: UserDto };
   }
-	// Delete Role from User
-	async delUserRole(email, role) {
-		const user = await userModel.findOne({ email });
+  // Delete Role from User
+  async delUserRole(email, role) {
+    const user = await userModel.findOne({ email });
     if (!user) {
       throw ApiError.BadRequest(`Пользователь ${email} не найден!`);
     }
-		const roleData = await roleModel.findOne({ value: role });
+    const roleData = await roleModel.findOne({ value: role });
     if (!roleData) {
       throw ApiError.BadRequest(`Роль ${role} не найдена`);
     }
     if (!user.roles.includes(roleData._id)) {
       throw ApiError.BadRequest(`Такой роли нет`);
     }
-		user.roles = user.roles.filter(item => !item.equals(roleData._id));
-		await user.save();
-		const message = {
+    user.roles = user.roles.filter((item) => !item.equals(roleData._id));
+    await user.save();
+    const message = {
       state: "warning",
       msg: `Роль успешно удалена`,
       err: "",
     };
     return { message, user: UserDto };
-	}
+  }
 }
 
 module.exports = new UserService();

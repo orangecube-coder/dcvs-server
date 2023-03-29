@@ -9,12 +9,12 @@ const authMiddleware = require("../middleware/auth-middleware");
 const roleMiddleware = require("../middleware/role-middleware");
 
 router.post(
-  "/registration",
+  "/users/add",
   body("firstName").notEmpty(),
   body("lastName").notEmpty(),
   body("email").isEmail(),
   body("password").isLength({ min: 3, max: 32 }),
-  userController.registration
+  userController.addUser
 );
 router.post("/login", authController.login);
 router.post("/logout", authController.logout);
@@ -22,9 +22,9 @@ router.get("/activate/:link", mailController.activate);
 router.get("/refresh", authController.refresh);
 //router.get('/users', roleMiddleware(['USER']), userController.getAllUsers);
 router.get("/users", roleMiddleware(["ADMIN"]), userController.getAllUsers);
-router.post("/adduserrole", roleMiddleware(["ADMIN"]), userController.addUserRole);
+router.post("/users/addrole", roleMiddleware(["ADMIN"]), userController.addUserRole);
 router.get("/", (req, res) => res.send("Conntection to API DCVS success!"));
 router.get("/roles", authMiddleware, roleController.getAllRoles);
-router.post("/deluserrole", authMiddleware, userController.delUserRole);
+router.post("/users/delrole", authMiddleware, userController.delUserRole);
 
 module.exports = router;
