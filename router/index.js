@@ -14,6 +14,7 @@ router.post(
   body("lastName").notEmpty(),
   body("email").isEmail(),
   body("password").isLength({ min: 3, max: 32 }),
+	roleMiddleware(["ADMIN"]),
   userController.addUser
 );
 router.post("/login", authController.login);
@@ -25,6 +26,7 @@ router.get("/users", roleMiddleware(["ADMIN"]), userController.getAllUsers);
 router.post("/users/addrole", roleMiddleware(["ADMIN"]), userController.addUserRole);
 router.get("/", (req, res) => res.send("Conntection to API DCVS success!"));
 router.get("/roles", authMiddleware, roleController.getAllRoles);
-router.post("/users/delrole", authMiddleware, userController.delUserRole);
+router.post("/users/delrole", roleMiddleware(["ADMIN"]), userController.delUserRole);
+router.post("/users/del", roleMiddleware(["ADMIN"]), userController.delUser);
 
 module.exports = router;

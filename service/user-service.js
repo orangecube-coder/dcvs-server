@@ -36,7 +36,7 @@ class UserService {
     // 	message.msg = message.msg + ", но с ошибкой!";
     // 	message.err = err;
     // }
-    return { message, user: userDto };
+    return { message };
   }
   // Get all Users
   async getAllUsers() {
@@ -66,7 +66,7 @@ class UserService {
       msg: `Роль успешно добавлена`,
       err: "",
     };
-    return { message, user: UserDto };
+    return { message };
   }
   // Delete Role from User
   async delUserRole(email, role) {
@@ -88,7 +88,21 @@ class UserService {
       msg: `Роль успешно удалена`,
       err: "",
     };
-    return { message, user: UserDto };
+    return { message };
+  }
+  // Delete User
+  async delUser(email) {
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      throw ApiError.BadRequest(`Пользователь ${email} не найден!`);
+    }
+    await user.remove();
+    const message = {
+      state: "warning",
+      msg: `Пользователь успешно удален`,
+      err: "",
+    };
+    return { message };
   }
 }
 

@@ -13,7 +13,7 @@ class UserController {
         );
       }
       const { firstName, lastName, email, password } = req.body;
-      const userData = await userService.registration(
+      const userData = await userService.addUser(
         firstName,
         lastName,
         email,
@@ -33,7 +33,7 @@ class UserController {
       next(e);
     }
   }
-  // Add role to user
+  // Add role to User
   async addUserRole(req, res, next) {
     try {
       const { email, role } = req.body;
@@ -43,16 +43,26 @@ class UserController {
       next(e);
     }
   }
-	// Delete role from user
-	async delUserRole(req, res, next) {
-		try {
-			const { email, role } = req.body;
-			const roleResult = await userService.delUserRole(email, role);
-			return res.json(roleResult);
-		} catch (e) {
-			next(e)
-		}
-	}
+  // Delete role from User
+  async delUserRole(req, res, next) {
+    try {
+      const { email, role } = req.body;
+      const roleDelResult = await userService.delUserRole(email, role);
+      return res.json(roleDelResult);
+    } catch (e) {
+      next(e);
+    }
+  }
+  // Delete User
+  async delUser(req, res, next) {
+    try {
+      const { email } = req.body;
+      const userDelResult = await userService.delUser(email);
+      return res.json(userDelResult);
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 module.exports = new UserController();

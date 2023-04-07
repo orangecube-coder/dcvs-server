@@ -1,10 +1,10 @@
 module.exports = class ApiError extends Error {
-	status;
+	state;
 	errors;
 
-	constructor(status, message, errors = []) {
+	constructor(state, message, errors = []) {
 		super(message);
-		this.status = status;
+		this.state = state;
 		this.errors = errors;
 	}
 
@@ -17,7 +17,6 @@ module.exports = class ApiError extends Error {
 	}
 
 	static BadRequest(message, errors = []) {
-		console.log(message);
 		return new ApiError(400, message, errors);
 	}
 
