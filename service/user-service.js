@@ -81,6 +81,9 @@ class UserService {
     if (!user.roles.includes(roleData._id)) {
       throw ApiError.BadRequest(`Такой роли нет`);
     }
+		if (user.roles.length <= 1) {
+			throw ApiError.BadRequest("Нельзя удалить единственную роль");
+		}
     user.roles = user.roles.filter((item) => !item.equals(roleData._id));
     await user.save();
     const message = {
