@@ -1,7 +1,6 @@
 const userModel = require("../models/user-model");
 const roleModel = require("../models/role-model");
 const ApiError = require("../exceptions/api-error");
-const UserDto = require("../dtos/user-dtos");
 
 class RoleService {
   async getAllRoles() {
@@ -11,11 +10,15 @@ class RoleService {
   async getRolesByEmail(email) {
     const { roles } = await userModel
       .findOne({ email })
-      .populate({ path: "roles", select: "-_id -__v" });
+      .populate({
+        path: "roles",
+        select: "-_id -__v",
+        transform: ({ value }) => value,
+      });
     if (!roles) {
       throw ApiError.BadRequest(`Что-то пошло не так`);
     }
-    return roles.flatMap(({ value }) => value);
+    return roles;
   }
 }
 module.exports = new RoleService();
