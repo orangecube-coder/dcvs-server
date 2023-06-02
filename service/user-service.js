@@ -7,7 +7,7 @@ const UserDto = require("../dtos/user-dtos");
 
 class UserService {
   // Add User
-  async addUser(firstName, lastName, email, password) {
+  async addUser(name, email, password) {
     const candidate = await userModel.findOne({ email });
     if (candidate) {
       throw ApiError.BadRequest(`Такой пользователь уже существует!`);
@@ -16,8 +16,7 @@ class UserService {
     const activationLink = uuid.v4();
     const role = await roleModel.findOne({ value: "USER" });
     const user = await userModel.create({
-      firstName,
-      lastName,
+      name,
       email,
       password: hashPassword,
       activationLink,
@@ -26,7 +25,7 @@ class UserService {
     const userDto = new UserDto(user);
     const message = {
       state: "success",
-      msg: `Пользователь успешно зарегистрирован`,
+      msg: `Пользователь добавлен`,
       err: "",
     };
     // try {
@@ -40,69 +39,70 @@ class UserService {
   }
   // Get all Users
   async getAllUsers() {
-    const users = await userModel.find({}, "-_id -password -__v").populate({
+    const users = await userModel.find({}, "-password -__v").populate({
       path: "roles",
-      select: "-_id -__v",
-      transform: ({ value }) => value,
+      select: "-__v",
+      // transform: ({ value }) => value,
     });
     return users;
   }
-  async addUserRole(email, role) {
-    const user = await userModel.findOne({ email });
-    if (!user) {
-      throw ApiError.BadRequest(`Пользователь ${email} не найден!`);
+  async addUserRole(user, role) {
+    const userData = await userModel.findOne({ _id: user._id });
+    if (!userData) {
+      throw ApiError.BadRequest(`Пользователь ${user.email} не найден!`);
     }
-    const roleData = await roleModel.findOne({ value: role });
+    const roleData = await roleModel.findOne({ _id: role._id });
     if (!roleData) {
-      throw ApiError.BadRequest(`Роль ${role} не найдена`);
+      throw ApiError.BadRequest(`Роль ${role.value} не найдена`);
     }
-    if (user.roles.includes(roleData._id)) {
+    if (userData.roles.includes(roleData._id)) {
       throw ApiError.BadRequest(`Такая роль уже имеется`);
     }
-    user.roles.push(roleData._id);
-    await user.save();
+    userData.roles.push(roleData._id);
+    await userData.save();
     const message = {
       state: "success",
-      msg: `Роль успешно добавлена`,
+      msg: `Роль добавлена`,
       err: "",
     };
     return { message };
   }
   // Delete Role from User
-  async delUserRole(email, role) {
-    const user = await userModel.findOne({ email });
-    if (!user) {
+  async delUserRole(user, role) {
+    const userData = await userModel.findOne({ _id: user._id });
+    if (!userData) {
       throw ApiError.BadRequest(`Пользователь ${email} не найден!`);
     }
-    const roleData = await roleModel.findOne({ value: role });
+    const roleData = await roleModel.findOne({ _id: role._id });
     if (!roleData) {
       throw ApiError.BadRequest(`Роль ${role} не найдена`);
     }
-    if (!user.roles.includes(roleData._id)) {
+    if (!userData.roles.includes(roleData._id)) {
       throw ApiError.BadRequest(`Такой роли нет`);
     }
-		if (user.roles.length <= 1) {
+		if (userData.roles.length <= 1) {
 			throw ApiError.BadRequest("Нельзя удалить единственную роль");
 		}
-    user.roles = user.roles.filter((item) => !item.equals(roleData._id));
-    await user.save();
+    userData.roles = userData.roles.filter((item) => !item.equals(roleData._id));
+    await userData.save();
     const message = {
       state: "warning",
-      msg: `Роль успешно удалена`,
+      msg: `Роль удалена`,
       err: "",
     };
     return { message };
   }
   // Delete User
-  async delUser(email) {
-    const user = await userModel.findOne({ email });
-    if (!user) {
-      throw ApiError.BadRequest(`Пользователь ${email} не найден!`);
+  async delUser(user) {
+    const userData = await userModel.findOne({ _id: user._id });
+    if (!userData) {
+      throw ApiError.BadRequest(`Пользователь ${user.email} не найден!`);
     }
-    await user.remove();
+		await userData.update
+    await userData.remove();
     const message = {
       state: "warning",
-      msg: `Пользователь успешно удален`,
+      msg: `Пользователь удален`,
       err: "",
     };
     return { message };

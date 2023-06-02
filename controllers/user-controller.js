@@ -12,10 +12,9 @@ class UserController {
           ApiError.BadRequest("Ошибка при валидации", errors.array())
         );
       }
-      const { firstName, lastName, email, password } = req.body;
+      const { name, email, password } = req.body;
       const userData = await userService.addUser(
-        firstName,
-        lastName,
+        name,
         email,
         password
       );
@@ -36,8 +35,8 @@ class UserController {
   // Add role to User
   async addUserRole(req, res, next) {
     try {
-      const { email, role } = req.body;
-      const roleResult = await userService.addUserRole(email, role);
+      const { user, role } = req.body;
+      const roleResult = await userService.addUserRole(user, role);
       return res.json(roleResult);
     } catch (e) {
       next(e);
@@ -46,8 +45,8 @@ class UserController {
   // Delete role from User
   async delUserRole(req, res, next) {
     try {
-      const { email, role } = req.body;
-      const roleDelResult = await userService.delUserRole(email, role);
+      const { user, role } = req.body;
+      const roleDelResult = await userService.delUserRole(user, role);
       return res.json(roleDelResult);
     } catch (e) {
       next(e);
@@ -56,8 +55,8 @@ class UserController {
   // Delete User
   async delUser(req, res, next) {
     try {
-      const { email } = req.body;
-      const userDelResult = await userService.delUser(email);
+      const { user } = req.body;
+      const userDelResult = await userService.delUser(user);
       return res.json(userDelResult);
     } catch (e) {
       next(e);

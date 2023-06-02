@@ -7,13 +7,11 @@ const UserDto = require("../dtos/user-dtos");
 class AuthService {
   // Login
   async login(email, password) {
-    let user = await userModel
-      .findOne({ email })
-      .populate({
-        path: "roles",
-        select: "-_id -__v",
-        transform: ({ value }) => value,
-      });
+    let user = await userModel.findOne({ email }).populate({
+      path: "roles",
+      select: "-__v",
+      // transform: ({ value }) => value,
+    });
     if (!user) {
       throw ApiError.BadRequest(`Пользователь ${email} не найден!`);
     }
@@ -24,7 +22,6 @@ class AuthService {
     user.lastLogin = Date.now();
     await user.save();
     const userDto = new UserDto(user);
-    console.log(userDto.roles);
     const tokens = tokenService.generateTokens({ ...userDto });
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
     return { ...tokens, user: userDto };
@@ -44,19 +41,16 @@ class AuthService {
     if (!userData || !tokenFromDb) {
       throw ApiError.UnauthorizedError();
     }
-    const user = await userModel
-      .findById(userData.id)
-      .populate({
-        path: "roles",
-        select: "-_id -__v",
-        transform: ({ value }) => value,
-      });
+    const user = await userModel.findById(userData.id).populate({
+      path: "roles",
+      select: "-__v",
+      // transform: ({ value }) => value,
+    });
     user.lastLogin = Date.now();
     await user.save();
     const userDto = new UserDto(user);
     const tokens = tokenService.generateTokens({ ...userDto });
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
-
     return { ...tokens, user: userDto };
   }
 }

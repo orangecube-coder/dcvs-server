@@ -7,11 +7,11 @@ const router = new Router();
 const { body } = require("express-validator");
 const authMiddleware = require("../middleware/auth-middleware");
 const roleMiddleware = require("../middleware/role-middleware");
+const journalController = require("../controllers/journal-controller");
 
 router.post(
   "/users/add",
-  body("firstName").notEmpty(),
-  body("lastName").notEmpty(),
+  body("name").notEmpty(),
   body("email").isEmail(),
   body("password").isLength({ min: 3, max: 32 }),
 	roleMiddleware(["ADMIN"]),
@@ -28,5 +28,12 @@ router.get("/", (req, res) => res.send("Conntection to API DCVS success!"));
 router.get("/roles", authMiddleware, roleController.getAllRoles);
 router.post("/users/delrole", roleMiddleware(["ADMIN"]), userController.delUserRole);
 router.post("/users/del", roleMiddleware(["ADMIN"]), userController.delUser);
+router.get("/journal/nodes", authMiddleware, journalController.getAllNodes);
+router.post("/journal/delnode", roleMiddleware(["ADMIN"]), journalController.delNode);
+router.post("/journal/addnode", roleMiddleware(["ADMIN"]), journalController.addNode);
+router.get("/journal/areas", authMiddleware, journalController.getAllAreas);
+router.post("/journal/delarea", roleMiddleware(["ADMIN"]), journalController.delArea);
+router.post("/journal/addarea", roleMiddleware(["ADMIN"]), journalController.addArea);
+router.post("/journal/editarea", roleMiddleware(["ADMIN"]), journalController.editArea);
 
 module.exports = router;
