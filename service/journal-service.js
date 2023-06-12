@@ -78,16 +78,31 @@ class JournalService {
     return { message };
   }
 
-  async editArea(area) {
+  async editArea(area, value, description) {
     const areaData = await areaModel.findOne({ _id: area._id });
     if (!areaData) {
       throw ApiError.BadRequest(`Зона ${area.value} не найдена!`);
     }
-    areaData.overwrite({ value: area.value, description: area.description });
+    areaData.overwrite({ value, description });
     await areaData.save();
     const message = {
       state: "success",
       msg: `Зона успешно обновлена`,
+      err: "",
+    };
+    return { message };
+  }
+
+	async editNode(node, value, area) {
+    const nodeData = await nodeModel.findOne({ _id: node._id });
+    if (!nodeData) {
+      throw ApiError.BadRequest(`Узел ${node.value} не найден!`);
+    }
+    nodeData.overwrite({ value, area });
+    await nodeData.save();
+    const message = {
+      state: "success",
+      msg: `Узел успешно обновлён`,
       err: "",
     };
     return { message };

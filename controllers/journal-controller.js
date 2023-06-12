@@ -64,9 +64,19 @@ class JournalController {
 
 	async editArea(req, res, next) {
 		try {
-			const { area } = req.body;
-      const areaEditResult = await journalService.editArea(area);
+			const { area, value, description } = req.body;
+      const areaEditResult = await journalService.editArea(area, value, description);
       return res.json(areaEditResult);
+		} catch (e) {
+			next(e);
+		}
+	}
+
+	async editNode(req, res, next) {
+		try {
+			const { node, value, area } = req.body;
+      const nodeEditResult = await journalService.editNode(node, value, area);
+      return res.json(nodeEditResult);
 		} catch (e) {
 			next(e);
 		}

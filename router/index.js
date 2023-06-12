@@ -31,6 +31,7 @@ router.post("/users/del", roleMiddleware(["ADMIN"]), userController.delUser);
 router.get("/journal/nodes", authMiddleware, journalController.getAllNodes);
 router.post("/journal/delnode", roleMiddleware(["ADMIN"]), journalController.delNode);
 router.post("/journal/addnode", roleMiddleware(["ADMIN"]), journalController.addNode);
+router.post("/journal/editnode", roleMiddleware(["ADMIN"]), journalController.editNode);
 router.get("/journal/areas", authMiddleware, journalController.getAllAreas);
 router.post("/journal/delarea", roleMiddleware(["ADMIN"]), journalController.delArea);
 router.post("/journal/addarea", roleMiddleware(["ADMIN"]), journalController.addArea);
