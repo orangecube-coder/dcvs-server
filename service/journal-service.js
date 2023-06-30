@@ -1,6 +1,8 @@
 const nodeModel = require("../models/node-model");
 const areaModel = require("../models/area-model");
 const ApiError = require("../exceptions/api-error");
+const journalModel = require("../models/journal-model");
+const userModel = require("../models/user-model");
 
 class JournalService {
   async getAllNodes() {
@@ -16,13 +18,35 @@ class JournalService {
     return areas;
   }
 
-  async addNode(nodeName, area) {
+  async getAllJournalItems() {
+    const journalItems = await journalModel
+      .find({}, "-__v")
+      .populate({
+        path: "node",
+        select: "-__v",
+				populate: {
+          path: "area",
+          select: "-__v",
+        },
+      })
+      .populate({
+        path: "user",
+        select: "-__v",
+      });
+    return journalItems;
+  }
+
+  async addNode(value, area) {
+    const candidate = await nodeModel.findOne({ value });
+    if (candidate) {
+      throw ApiError.BadRequest(`Такой узел уже существует!`);
+    }
     const areaData = await areaModel.findOne({ _id: area._id });
     if (!areaData) {
       throw ApiError.BadRequest(`Зона ${area.value} не найдена`);
     }
     const node = await nodeModel.create({
-      value: nodeName,
+      value,
       area: areaData._id,
     });
     const message = {
@@ -33,11 +57,36 @@ class JournalService {
     return { message };
   }
 
-  async addArea(areaName, areaDescription) {
-    const area = await areaModel.create({
-      value: areaName,
-      description: areaDescription,
+  async addJournalItem(node, user, timestamp, description) {
+    const nodeData = await nodeModel.findOne({ _id: node._id });
+    if (!nodeData) {
+      throw ApiError.BadRequest(`Узел ${node.value} не найден`);
+    }
+    const userData = await userModel.findOne({ _id: user._id });
+    console.log(user._id);
+    if (!userData) {
+      throw ApiError.BadRequest(`Пользователь ${user.name} не найден`);
+    }
+    const item = await journalModel.create({
+      node: node._id,
+      user: user._id,
+      timestamp,
+      description,
     });
+    const message = {
+      state: "success",
+      msg: `Запись успешно создана`,
+      err: "",
+    };
+    return { message };
+  }
+
+  async addArea(value, description) {
+    const candidate = await areaModel.findOne({ value });
+    if (candidate) {
+      throw ApiError.BadRequest(`Такая зона уже существует!`);
+    }
+    const area = await areaModel.create({ value, description });
     const message = {
       state: "success",
       msg: `Зона успешно зарегистрирована`,
@@ -45,6 +94,16 @@ class JournalService {
     };
     return { message };
   }
+
+  // async addJournalItem(node, timestamp, description) {
+  //   const journalItem = await journalModel.create({ node: node._id, timestamp, description });
+  //   const message = {
+  //     state: "success",
+  //     msg: `Запись успешно зарегистрирована`,
+  //     err: "",
+  //   };
+  //   return { message };
+  // }
 
   async delNode(node) {
     const nodeData = await nodeModel.findOne({ _id: node._id });
@@ -65,8 +124,8 @@ class JournalService {
     if (!areaData) {
       throw ApiError.BadRequest(`Зона ${area.value} не найдена!`);
     }
-		const nodeCount = await nodeModel.countDocuments({ area: area._id });
-		if (nodeCount > 0) {
+    const nodeCount = await nodeModel.countDocuments({ area: area._id });
+    if (nodeCount > 0) {
       throw ApiError.BadRequest(`Нельзя удалить зону содержащую узлы!`);
     }
     await areaData.remove();
@@ -93,7 +152,7 @@ class JournalService {
     return { message };
   }
 
-	async editNode(node, value, area) {
+  async editNode(node, value, area) {
     const nodeData = await nodeModel.findOne({ _id: node._id });
     if (!nodeData) {
       throw ApiError.BadRequest(`Узел ${node.value} не найден!`);

@@ -36,5 +36,7 @@ router.get("/journal/areas", authMiddleware, journalController.getAllAreas);
 router.post("/journal/delarea", roleMiddleware(["ADMIN"]), journalController.delArea);
 router.post("/journal/addarea", roleMiddleware(["ADMIN"]), journalController.addArea);
 router.post("/journal/editarea", roleMiddleware(["ADMIN"]), journalController.editArea);
+router.get("/journal/records", roleMiddleware(["ADMIN"]), journalController.getAllJournalItems);
+router.post("/journal/addrecord", roleMiddleware(["ADMIN"]), journalController.addJournalItem);
 
 module.exports = router;

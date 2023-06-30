@@ -41,7 +41,7 @@ class AuthService {
     if (!userData || !tokenFromDb) {
       throw ApiError.UnauthorizedError();
     }
-    const user = await userModel.findById(userData.id).populate({
+    const user = await userModel.findById(userData._id).populate({
       path: "roles",
       select: "-__v",
       // transform: ({ value }) => value,
@@ -50,7 +50,7 @@ class AuthService {
     await user.save();
     const userDto = new UserDto(user);
     const tokens = tokenService.generateTokens({ ...userDto });
-    await tokenService.saveToken(userDto.id, tokens.refreshToken);
+    await tokenService.saveToken(userDto._id, tokens.refreshToken);
     return { ...tokens, user: userDto };
   }
 }
