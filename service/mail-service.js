@@ -1,4 +1,6 @@
-const nodemailer = require('nodemailer');
+const nodemailer = require('nodemailer')
+const userModel = require('../models/user-model')
+const ApiError = require('../exceptions/api-error')
 
 class MailService {
 	constructor() {
@@ -9,7 +11,7 @@ class MailService {
 			auth: {
 				user: process.env.SMTP_USER,
 				pass: process.env.SMTP_PASSWORD,
-			}
+			},
 		})
 	}
 	// Send Link
@@ -20,21 +22,21 @@ class MailService {
 				to,
 				subject: 'Активация на ' + process.env.API_URL,
 				text: '',
-				html: `<div><h1>Пройдите по ссылке</h1><a href="${link}">${link}</a></div>`
+				html: `<div><h1>Пройдите по ссылке</h1><a href="${link}">${link}</a></div>`,
 			})
-		} catch(err) {
-			throw err;
+		} catch (err) {
+			throw err
 		}
 	}
 	// Activate
 	async activate(activationLink) {
-		const user = await userModel.findOne({ activationLink})
+		const user = await userModel.findOne({ activationLink })
 		if (!user) {
-			throw ApiError.BadRequest("Не корректная ссылка для активации!");
+			throw ApiError.BadRequest('Не корректная ссылка для активации!')
 		}
-		user.isActivaed = true;
-		await user.save();
+		user.isActivated = true
+		await user.save()
 	}
 }
 
-module.exports = new MailService();
+module.exports = new MailService()
